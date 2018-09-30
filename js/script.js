@@ -1,45 +1,82 @@
 'use strict';
 $(function() {
   
-  let currentSlide = 0; //bierzący slajd
-  $("#dot_" + currentSlide).addClass("active");
-  var carouselList = $('#carousel .photo');
+  let currentSlide = 0; //aktualny slajd
+  $("#dot_" + currentSlide).addClass("active"); //ustaw aktywną paginację na 0
+  var carouselList = $('#carousel .photo'); //pobierz foto
   var timeSlide;
   setTime();
-  
+  var z = 400;
 
   //funkcja przesuwania slajdu w prawo  
   function changeSlide () {
-    carouselList.animate({'marginLeft':-400}, 500, moveFirstSlide);
-    
+      carouselList.animate({'marginLeft':-z}, 500, moveFirstSlide);
+      nextslide()
+  }
+
+  function changeSlide1 () {
+      carouselList.animate({'marginLeft':-z}, 0, moveFirstSlide);
+      nextslide1()
+  }
+
+  function nextslide() {
+        if(currentSlide > 3){
+        currentSlide = 0;
+        $(".pagination li").removeClass("active");
+        $("#dot_" + currentSlide).addClass("active");
+        } 
+        else {
+          currentSlide++;
+          $(".pagination li").removeClass("active");
+          $("#dot_" + currentSlide).addClass("active");
+        }
+  }
+
+  function nextslide1() {
       if(currentSlide > 3){
       currentSlide = 0;
-      $(".pagination li").removeClass("active");
-      $("#dot_" + currentSlide).addClass("active");
       } 
       else {
         currentSlide++;
-        $(".pagination li").removeClass("active");
-        $("#dot_" + currentSlide).addClass("active");
       }
   }
 
   // funkcja przesuwania slajdu w lewo  
   function changeSlideBack() {
-    moveEndSlide();
-    carouselList.animate({'marginLeft':0}, 500);
-	
+      moveEndSlide();
+      carouselList.animate({'marginLeft':0}, 500);
+      backslide()
+    }
+
+  function changeSlideBack1() {
+      moveEndSlide();
+      carouselList.animate({'marginLeft':0}, 0);
+      backslide1();
+    }
+    
+  function backslide() {
+        if(currentSlide < 1){
+          currentSlide = 4;
+          $(".pagination li").removeClass("active");
+          $("#dot_" + currentSlide).addClass("active");
+        } 
+        else {
+          currentSlide--;
+          $(".pagination li").removeClass("active");
+          $("#dot_" + currentSlide).addClass("active");
+        }
+    }
+
+  function backslide1() {
       if(currentSlide < 1){
         currentSlide = 4;
-        $(".pagination li").removeClass("active");
-        $("#dot_" + currentSlide).addClass("active");
       } 
       else {
         currentSlide--;
-        $(".pagination li").removeClass("active");
-        $("#dot_" + currentSlide).addClass("active");
+        
       }
-  };
+  }
+ 
 
   //  dodanie slajdu pierwszego na koncu
   function moveFirstSlide() {
@@ -57,30 +94,42 @@ $(function() {
     carouselList.css({marginLeft:-400});
   }
   
-  //funkcja animacji
+  //funkcja animacji/ przesunięcia zgodna z wybranym point
   function anim_slide (point) {
-    carouselList.animate({'marginLeft': -400 * point}, 500);
+  carouselList.animate({'marginLeft': -400 * point}, 0);
   }
 
-  //czekaj na kliknięcie paginacji
+  //czekaj na kliknięcie dowolnej paginacji
   $(".pagination .dot").on('click', dots);
   
   //funkcja wyboru zdjecia z dolnej paginacji
   function dots () {
-  var point = $(this).index();
-  console.log(point);
-  $(".pagination .dot").removeClass("active");
-  $("#dot_" + point).addClass("active");
-  clearInterval(timeSlide);
-  anim_slide (point);
-  setTime();
-  currentSlide == point;
+    var point = $(this).index();
+    $(".pagination .dot").removeClass("active");
+    $("#dot_" + point).addClass("active");
+    clearInterval(timeSlide);
+    
+    var nslideback = currentSlide; //cofamy slajdy do początku, zgodnie z ostatnim currentSlide
+    for(var i = 0; i < nslideback; i++){
+    changeSlideBack1();
+  }
+
+  // przesunś slajdy do wybranego punktu 'point'
+  for(var i = 0; i <= point; i++){  
+    anim_slide (point);
+  }
+
+  var nslideforward = point; //zmienna: przesuwamy do wybranego slajdu
+  for(var i = 0; i < nslideforward; i++){
+    changeSlide1();
+  }
+    
+  setTime(); 
 };
 
-
-// funkcja ustawienia setintervalu    
+// funkcja ustawienia setinterval   
   function setTime() {
-  timeSlide = setInterval(changeSlide, 3000)
+    timeSlide = setInterval(changeSlide, 3000)
   };  
 
 // strzałka w prawo  
